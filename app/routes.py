@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, request,redirect, url_for, send_file, flash, abort, Response
+from manage import render_template, request,redirect, url_for, send_file, flash, abort, Response
 
 
 from app import app

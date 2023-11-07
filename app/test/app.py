@@ -1,7 +1,7 @@
 
 from collections import namedtuple
 import datetime
-from flask import Blueprint, jsonify, render_template
+from manage import Blueprint, jsonify, render_template
 
 from app.models import Item, Package, PackageUnit, RawOrder, RawOrderItem, WarehouseTask, WarehouseTaskProduct
 
