@@ -4,10 +4,10 @@ import stripe
 
 from flask import Blueprint, jsonify, request
 
-stripe = Blueprint("stripe", __name__, url_prefix="/stripe",)
+app = Blueprint("stripe", __name__, url_prefix="/stripe",)
 
 # This is your test secret API key.
-stripe.api_key = 'sk_test_80PRE7i1wnVMXGukAzvGUFgk009F4Jwvps'
+app.api_key = 'sk_test_80PRE7i1wnVMXGukAzvGUFgk009F4Jwvps'
 
 
 def calculate_order_amount(items):
@@ -16,18 +16,18 @@ def calculate_order_amount(items):
     # people from directly manipulating the amount on the client
     return 1400
 
-@stripe.route('/', methods=['GET'])
+@app.route('/', methods=['GET'])
 def index():
     return jsonify({
         'test': 'ok'
     })
 
-@stripe.route('/test', methods=['GET', 'POST'])
+@app.route('/test', methods=['GET', 'POST'])
 def test():
     return jsonify({
         'clientSecret': 'dafdjaklf'
     })
-@stripe.route('/create-payment-intent', methods=['POST'])
+@app.route('/create-payment-intent', methods=['POST'])
 def create_payment():
     try:
         data = json.loads(request.data)
@@ -48,5 +48,3 @@ def create_payment():
     except Exception as e:
         return jsonify(error=str(e)), 403
 
-def create_app():
-    return app
