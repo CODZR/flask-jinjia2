@@ -17,8 +17,8 @@ slack_ai_blueprint = Blueprint(
     url_prefix="/ai",
 )
 
-SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
-OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = WebClient(token=SLACK_BOT_TOKEN)
 
 

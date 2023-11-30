@@ -1,5 +1,5 @@
 from slack_sdk import WebClient
-from bot import Bot
+from .bot import Bot
 import os
 import re
 
