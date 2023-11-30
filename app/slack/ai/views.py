@@ -51,7 +51,7 @@ def handle_event(type, slack_event):
     return response_ok()
 
 
-@slack_ai_blueprint.route("/", methods=["GET"])
+@slack_ai_blueprint.route("/", methods=["POST"])
 def handle():
     slack_event = json.loads(request.data)
 
