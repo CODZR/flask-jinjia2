@@ -17,3 +17,8 @@ def response_error():
 def response_ok():
     response = make_response("OK", 200)
     return response
+
+
+def empty_response():
+    response = make_response("None", 204)
+    return response

@@ -7,7 +7,9 @@ import requests
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.errors import SlackApiError
 from typing import Dict, Any, Optional, Callable, List
-from .. import EMPTY_RESPONSE
+
+from app.response import empty_response
+
 from ..chat.conversation import reply_conversation, reply_raw
 from ..chat.detect_task import detect_task
 from ..chat.rewriter import rewrite_ads, rewrite_ui, proofread
@@ -62,7 +64,7 @@ def handle_webhook_event(request: Request, *, is_dev: bool):
             event, dev_forwarder=None if is_dev else dev_forwarder
         )
 
-    return EMPTY_RESPONSE
+    return empty_response()
 
 
 def handle_queued_event(event: Dict[str, Any], *, is_dev: bool = False) -> None:
@@ -106,14 +108,14 @@ def _validate_request(request) -> None:
 
 
 def _handle_url_verification(body: Dict[str, Any]):
-    return Response({"challenge": body.get("challenge")})
+    return make_response({"challenge": body.get("challenge")})
 
 
 def _handle_event_callback(
     event: Dict[str, Any], *, dev_forwarder: Optional[Callable[[Message], bool]] = None
 ):
     if not _should_process(event):
-        return EMPTY_RESPONSE
+        return empty_response()
 
     m = Message(
         user=user_profile_provider.get(event["user"]),
@@ -126,17 +128,17 @@ def _handle_event_callback(
     if dev_forwarder:
         forwarded = dev_forwarder(m)
         if forwarded:
-            return EMPTY_RESPONSE
+            return empty_response()
 
     if m.args.help:
         _reply_to_event(
             event,
             f"Hi! I'm Vira :wave:. I'm your personal assistant. <{ABOUT_PAGE_LINK}|See what I can do>",
         )
-        return EMPTY_RESPONSE
+        return empty_response()
 
     _queue_event(event)
-    return EMPTY_RESPONSE
+    return empty_response()
 
 
 def _should_process(event: Dict[str, Any]) -> bool:
