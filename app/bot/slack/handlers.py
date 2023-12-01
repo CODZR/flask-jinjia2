@@ -1,6 +1,6 @@
 import json
 import re
-from flask import Request, Response
+from flask import Request, Response, make_response
 from openai import BadRequestError
 import requests
 
@@ -13,7 +13,7 @@ from app.response import empty_response
 from ..chat.conversation import reply_conversation, reply_raw
 from ..chat.detect_task import detect_task
 from ..chat.rewriter import rewrite_ads, rewrite_ui, proofread
-from . import SLACK_SIGN_SECRET, slack_client
+from . import SLACK_SIGNING_SECRET, slack_client
 from .user_profile import user_profile_provider
 from .message import Message, get_thread_head, get_thread_messages
 
@@ -26,8 +26,10 @@ ABOUT_PAGE_LINK = f"slack://app?team={SLACK_TEAM_ID}&id=A0512MD4JJH&tab=about"
 def handle_webhook_event(request: Request, *, is_dev: bool):
     _validate_request(request)
 
-    body = request.json_body
+    body = request.get_json()
     event_type = body.get("type")
+    print("event_type", event_type)
+
     if event_type == "url_verification":
         return _handle_url_verification(body)
 
@@ -40,22 +42,25 @@ def handle_webhook_event(request: Request, *, is_dev: bool):
             if not m.args.dev:
                 return False
 
-            signer = SignatureVerifier(SLACK_SIGN_SECRET)
+            signer = SignatureVerifier(SLACK_SIGNING_SECRET)
             timestamp = str(int(signer.clock.now()))
-            sig = signer.generate_signature(timestamp=timestamp, body=request.raw_body)
+            raw_body = request.get_data()
+            sig = signer.generate_signature(timestamp=timestamp, body=raw_body)
             headers = {
                 "Content-Type": "application/json",
                 "X-Slack-Request-Timestamp": timestamp,
                 "X-Slack-Signature": sig,
             }
 
+            raw_body = request.get_data()
+            dev_event_url = "https://4a32-192-169-96-200.ngrok-free.app/slack/events"
             r = requests.post(
-                "https://vira-dev.vibe.dev/slack/event",
-                data=request.raw_body,
+                dev_event_url,
+                data=raw_body,
                 headers=headers,
             )
             print(
-                f"Forwarded request to dev endpoint. Status code: {r.status_code}. Body: {request.raw_body}"
+                f"Forwarded request to dev endpoint. Status code: {r.status_code}. Body: {raw_body}"
             )
 
             return True
@@ -101,8 +106,11 @@ def handle_queued_event(event: Dict[str, Any], *, is_dev: bool = False) -> None:
 
 
 def _validate_request(request) -> None:
-    verifier = SignatureVerifier(SLACK_SIGN_SECRET)
-    is_valid = verifier.is_valid_request(request.raw_body, request.headers)
+    verifier = SignatureVerifier(SLACK_SIGNING_SECRET)
+    print("SLACK_SIGNING_SECRET", SLACK_SIGNING_SECRET)
+    raw_body = request.get_data()
+    print(raw_body)
+    is_valid = verifier.is_valid_request(raw_body, request.headers)
     if not is_valid:
         raise BadRequestError("Invalid request signature")
 
