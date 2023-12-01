@@ -3,7 +3,7 @@ from flask_cors import CORS
 
 APP_NAME = "flask-jinjia2"
 
-from .bot.views import slack_blueprint
+from .slack.views import slack_blueprint
 
 app = Flask(__name__)
 app.register_blueprint(slack_blueprint)
