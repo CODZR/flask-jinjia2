@@ -1,5 +1,7 @@
 from slack_sdk import WebClient
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 import time
 
 
@@ -12,7 +14,7 @@ Be as concise as possible."""
 
 
 class Bot:
-    def init(self, client: WebClient):
+    def __init__(self, client: WebClient):
         # https://api.slack.com/methods/users.list/
         self.prc = []
         self.users = dict()
@@ -43,9 +45,7 @@ class Bot:
         return output, tokens
 
     def send_to_openai(self, chat_dict):
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", messages=chat_dict
-        )
+        response = client.chat.completions.create(model="gpt-3.5-turbo", messages=chat_dict)
         print(response)
         # Dummy
         output = response["choices"][0]["message"]["content"].strip()

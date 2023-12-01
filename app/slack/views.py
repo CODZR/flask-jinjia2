@@ -11,7 +11,7 @@ bot_app = App(
     token=os.getenv("SLACK_BOT_TOKEN"), signing_secret=os.getenv("SLACK_SIGNING_SECRET")
 )
 
-bot_handler = SlackRequestHandler(bot_app)
+slack_handler = SlackRequestHandler(bot_app)
 
 
 slack_blueprint = Blueprint(
@@ -28,6 +28,6 @@ def test():
     return jsonify({"hello": "slack"})
 
 
-@slack_blueprint.route("/events", methods=["POST"])
-def slack_events():
-    return bot_handler.handle(request)
+# @slack_blueprint.route("/events", methods=["POST"])
+# def slack_events():
+#     return slack_handler.handle(request)

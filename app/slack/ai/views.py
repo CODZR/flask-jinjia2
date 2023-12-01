@@ -24,21 +24,21 @@ client = WebClient(token=SLACK_BOT_TOKEN)
 
 # ID of the channel you want to send the message to
 read_tokens()
-openai.api_key = OPENAI_API_KEY
-bot = Bot()
+
+bot = Bot(client)
 
 
 def handle_event(type, slack_event):
     event = slack_event["event"]
+    print(slack_event)
     if "type" not in slack_event or "channel" not in event:
         return response_ok()
     channel = event["channel"]
 
-    print(slack_event)
     if type == "app_mention":
         ts = event["ts"]
-        if not bot.mark(ts):
-            return response_ok()
+        # if not bot.mark(ts):
+        #     return response_ok()
         query = event["text"]
         query = parse_mention(query, bot, client)
 
